@@ -8,6 +8,7 @@ Este repositorio contiene código e instrucciones para poder ejecutar un detecto
 </ul>
 
 ## Instrucciones de ejecución
+Estas instrucciones asumen que se esta trabajando en un sistema operativo Windows.
 
 Primeramente hay que instalar Anaconda https://www.anaconda.com/products/individual
 
@@ -17,11 +18,17 @@ Ahora vamos al siguiente link https://drive.google.com/file/d/1FyiScOQduz6I3KBoR
 
 El tener un GPU NVIDIA permite al modelo realizar inferencias más rápido. En caso de tener y querer utilizar un GPU NVIDIA, hay que descargar el driver de su GPU NVIDIA de la siguiente página https://www.nvidia.com/Download/index.aspx
 
-Posteriormente hay que crear el ambiente de ejecución de Anaconda con ayuda del archivo ```Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/conda-gpu.yml``` en caso de tener GPU NVIDIA (Permite al modelos correr más rápido), o en caso de no contar con GPU NVIDIA ```Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/conda-cpu.yml``` para poder correr la aplicación web. En una terminal de Anaconda con permisos de administrador ejecutamos:
+Posteriormente hay que crear el ambiente de ejecución de Anaconda con ayuda del archivo ```Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/conda-gpu.yml``` en caso de tener GPU NVIDIA (permite al modelo correr más rápido), o en caso de no contar con GPU NVIDIA ```Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/conda-cpu.yml``` en una terminal de anaconda nos movemos a la carpeta del repositorio y ejecutamos.
 
 ```
-conda env create -f clasificadorWeb.yml
-conda activate clasificadorWeb
+cd yolov3_deepsort
+# Si solo contamos con CPU
+conda env create -f conda-cpu.yml
+conda activate tracker-cpu
+
+# Si contamos con GPU
+conda env create -f conda-gpu.yml
+conda activate tracker-gpu
 ```
 
 Dentro de la misma terminal nos movemos al directorio ```Repositorios```  y ejecutamos: 
