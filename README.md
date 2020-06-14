@@ -49,15 +49,11 @@ Listo! Ahora ya podemos ejecutar nuestro detector, con el video de nuestra elecc
 python object_tracker.py --video ./data/video/despacho.mp4 --yolo_score_threshold 0.3
 ```
 
-## Ejecución esperada
-Al ejecutar el comando anterior deberíamos obtener una pantalla como la siguiente:
+## Salida del programa
+Al ejecutar el comando anterior deberíamos obtener una pantalla mostrando el video y las detecciones como en las siguientes imágenes:
 
-![alt text](https://github.com/Magraz/ProyectoFinal-Tec.-Info-Emergentes/blob/master/images/start.PNG "Pantalla de inicio")
+![alt text](https://github.com/Magraz/Proyecto-Sistemas-de-Vision-Computarizada/blob/master/images/example.PNG "Ejemplo 1")
 
-Primeramente debemos elegir una imagen a clasificar presionando el botón "Choose file", ya que este cargada la imagen presionamos el botón "Predict" y obtendremos un resultado como este:
+![alt text](https://github.com/Magraz/Proyecto-Sistemas-de-Vision-Computarizada/blob/master/images/example.PNG "Ejemplo 1")
 
-![alt text](https://github.com/Magraz/ProyectoFinal-Tec.-Info-Emergentes/blob/master/images/visuals.PNG "Resultado")
-
-Si accedemos a la página local http://localhost:5000/static/predict.html el proceso es el mismo al anterior, solo que ahora se presentan los resultados en forma de probabilidades por clase:
-
-![alt text](https://github.com/Magraz/ProyectoFinal-Tec.-Info-Emergentes/blob/master/images/no_visuals.PNG "Resultado")
+El programa genera detecciones y rastrea estas detecciones a lo largo del video. En cuanto un vehículo se encuentra en un radio de 300px. de un humano se aumenta el contador de personas en peligro (este número se puede modificar en el archivo object_tracker.py, por motivos de demostración en el video el valor es más alto de lo necesario) el humano es rodeado por un círculo rojo y el vehículo por un círculo verde, las dos clases son conectadas por una línea azul que indica la conexión entre los objetos.
