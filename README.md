@@ -13,9 +13,11 @@ Primeramente hay que instalar Anaconda https://www.anaconda.com/products/individ
 
 Descargamos este repositorio en formato .zip y lo extraemos en el directorio de su preferencia. Para facilitar la explicación asumiremos que el repositorio se extrajo dentro un folder llamado ```Repositorios```
 
-Ahora vamos al siguiente link https://drive.google.com/file/d/1FyiScOQduz6I3KBoRksW2lj43sAxZVAZ/view?usp=sharing y descargamos el archivo ```VGG16_bikes_cars_trains_rollers_trucks.h5``` dentro del directorio ```Repositorios/ProyectoFinal-Tec.-Info-Emergentes```. Este archivo contiene la configuración de nuestro clasificador
+Ahora vamos al siguiente link https://drive.google.com/file/d/1FyiScOQduz6I3KBoRksW2lj43sAxZVAZ/view?usp=sharing y descargamos el archivo ```VGG16_bikes_cars_trains_rollers_trucks.h5``` dentro del directorio ```Repositorios/Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/weights```. Este archivo contiene la configuración de nuestro modelo.
 
-Posteriormente hay que crear el ambiente de ejecución de Anaconda con ayuda del archivo ```clasificadorWeb.yml``` para poder correr la aplicación web. En una terminal de Anaconda con permisos de administrador ejecutamos:
+El tener un GPU NVIDIA permite al modelo realizar inferencias más rápido. En caso de tener y querer utilizar un GPU NVIDIA, hay que descargar el driver de su GPU NVIDIA de la siguiente página https://www.nvidia.com/Download/index.aspx
+
+Posteriormente hay que crear el ambiente de ejecución de Anaconda con ayuda del archivo ```Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/conda-gpu.yml``` en caso de tener GPU NVIDIA (Permite al modelos correr más rápido), o en caso de no contar con GPU NVIDIA ```Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/conda-cpu.yml``` para poder correr la aplicación web. En una terminal de Anaconda con permisos de administrador ejecutamos:
 
 ```
 conda env create -f clasificadorWeb.yml
