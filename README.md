@@ -41,17 +41,16 @@ pip install -r requirements-gpu.txt
 ```
 Ahora transformamos nuestra configuración descargada a un modelo de Tensorflow. Dentro de la misma terminal ejecutamos: 
 ```
-python load_weights.py --weights ./weights/<YOUR CUSTOM WEIGHTS FILE> --output ./weights/yolov3-custom.tf --num_classes <# CLASSES>
+python load_weights.py --weights ./weights/yolov3_custom_last.weights --output ./weights/yolov3-custom.tf --num_classes 2
 ```
 
-Estos comandos realizan la configuración necesaria para habilitar nuestro clasificador web. Para poder utilizar la aplicación web hay que accessar a cualquiera de las siguientes páginas locales:
-* http://localhost:5000/static/predict_with_visuals.html Clasificador que los resultados a través de gráficas
-* http://localhost:5000/static/predict.html Clasificador que muestra las probabilidades de cada clase
-
- <b>NOTA:</b> Estas páginas solo funcionan desde la computadora en la que se esta realizando esta configuración
+Listo! Ahora ya podemos ejecutar nuestro detector, con el video de nuestra elección, el repositorio contiene un video de ejemplo llamado ```despacho.mp4```, por lo que lo usaremos en el siguiente comando. Dentro de la misma terminal ejecutamos:
+```
+python object_tracker.py --video ./data/video/despacho.mp4 --yolo_score_threshold 0.3
+```
 
 ## Ejecución esperada
-Si accedemos a la página local http://localhost:5000/static/predict_with_visuals.html nos aparece la siguiente pantalla:
+Al ejecutar el comando anterior deberíamos obtener una pantalla como la siguiente:
 
 ![alt text](https://github.com/Magraz/ProyectoFinal-Tec.-Info-Emergentes/blob/master/images/start.PNG "Pantalla de inicio")
 
