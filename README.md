@@ -46,9 +46,15 @@ python load_weights.py --weights ./weights/yolov3_custom_last.weights --output .
 
 Listo! Ahora ya podemos ejecutar nuestro detector, con el video de nuestra elección, el repositorio contiene un video de ejemplo llamado ```despacho.mp4```, por lo que lo usaremos en el siguiente comando. Dentro de la misma terminal ejecutamos:
 ```
-python object_tracker.py --video ./data/video/despacho.mp4 --yolo_score_threshold 0.3
+python object_tracker.py --video ./data/video/despacho.mp4 --output ./data/video/results.avi --yolo_score_threshold 0.3
+#El video resultante con las detecciones se guarda en ./data/video/results.avi
 ```
 
+El programa también se puede correr tomando los datos de una cámara con el siguiente comando:
+```
+#Debemos conocer el número asignado a nuestro dispotivo cámara, en este caso el número es 0, el cual en caso de ejecutar el código sobre una laptop representa la cámara web.
+python object_tracker.py --video 0 --output ./data/video/results.avi --yolo_score_threshold 0.3
+```
 ## Salida del programa
 Al ejecutar el comando anterior deberíamos obtener una pantalla mostrando el video y las detecciones como en las siguientes imágenes:
 
@@ -56,4 +62,4 @@ Al ejecutar el comando anterior deberíamos obtener una pantalla mostrando el vi
 ---
 ![alt text](https://github.com/Magraz/Proyecto-Sistemas-de-Vision-Computarizada/blob/master/images/example2.PNG "Ejemplo 2")
 
-El programa genera detecciones y rastrea estas detecciones a lo largo del video. En cuanto un vehículo se encuentra en un radio de 300px. de un humano se aumenta el contador de personas en peligro (este número se puede modificar en el archivo object_tracker.py, por motivos de demostración en el video el valor es más alto de lo necesario) el humano es rodeado por un círculo rojo y el vehículo por un círculo verde, las dos clases son conectadas por una línea azul que indica la conexión entre los objetos.
+El programa genera detecciones y rastrea estas detecciones a lo largo del video. En cuanto un vehículo se encuentra en un radio de 300px. (este número se puede modificar en el archivo object_tracker.py, por motivos de demostración en el video el valor es más alto de lo necesario) de un humano se aumenta el contador de personas en peligro  el humano es rodeado por un círculo rojo y el vehículo por un círculo verde, las dos clases son conectadas por una línea azul que indica la conexión entre los objetos. Por último, el video es guardado en `Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/data/videos` con el nombre que se asigne en el comando.
