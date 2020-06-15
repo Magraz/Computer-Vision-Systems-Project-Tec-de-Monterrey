@@ -66,8 +66,11 @@ El programa genera detecciones y rastrea estas detecciones a lo largo del video.
 
 ## Solución experimental
 Contamos con una versión experimental del detector que compensa la diferencia de perspectiva y maneja las medidas en metros.
-Esta versión tiene un uso igual al original, por lo que todos los comandos anteriores aplican siempre y cuando se cambie el nombre por el de esta versión. Por lo tanto, para ejecutar detección en un video simplemente corremos el siguiente comando:
+Esta versión tiene un uso igual al original, por lo que todos los comandos anteriores aplican siempre y cuando se cambie el nombre por el de esta versión. Por lo tanto, para ejecutar detección en un video abrimos una terminal de anaconda y nos movemos a la carpeta ```Repositorios/Proyecto-Sistemas-de-Vision-Computarizada``` y corremos los siguientes comandos:
 ```
+conda activate tracker-gpu  # En caso de contar con GPU
+conda activate tracker-gpu # En caso de contar solo con CPU
+cd yolov3_deepsort
 python object_tracker_perspective.py --video ./data/video/despacho.mp4 --output ./data/video/results.avi --yolo_score_threshold 0.3
 ```
 Se abrirá una ventana con el primer cuadro del video congelado y se pedirá que se realicen algunos pasos de iniciación. 
