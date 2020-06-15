@@ -81,5 +81,6 @@ El último paso es seleccionar el área que se desea monitorear. Solo encerrar e
 Y listo. El video se analizará hasta completarse. Del lado izquierdo de la pantalla aparecerá la vista aérea de los puntos y del lado derecho aparecerá el video con las detecciones. Una línea roja se dibujará entre objetos si están a una menor distancia que la establecida, esta distancia (metros) se puede modificar en el archivo.
 
 ## Referencias
-Este repositorio esta basado en el siguiente repositorio:
+Este repositorio esta basado en código de los siguientes repositorio:
 https://github.com/theAIGuysCode/yolov3_deepsort
+https://github.com/aqeelanwar/SocialDistancingAI
