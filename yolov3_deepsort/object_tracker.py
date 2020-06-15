@@ -175,7 +175,7 @@ def main(_argv):
                     radii = normalizedDiags
 
                 for track in nonhuman_index:
-                    if lengths[track]<500:
+                    if lengths[track]<150:
                         inDanger+=1
                         break
 
@@ -184,7 +184,7 @@ def main(_argv):
                     #for track in range(0,len(tracker.tracks)):
                     for track in nonhuman_index:
                         try:
-                            if lengths[track]<=500 and track!=mainIndex:
+                            if lengths[track]<=150 and track!=mainIndex:
                                 cv2.line(img,mainCenterPoint,centerPoints[track],(255,0,0),1)
                                 cv2.circle(img, mainCenterPoint, int(radii[mainIndex]), (0,0,255), 2)
                                 cv2.circle(img, centerPoints[track], int(radii[track]), (0,255,0), 2)
