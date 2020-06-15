@@ -87,6 +87,6 @@ Y listo. El video se analizará hasta completarse. Del lado izquierdo de la pant
 ![alt text](https://github.com/Magraz/Proyecto-Sistemas-de-Vision-Computarizada/blob/master/images/example3.PNG "Ejemplo 3")
 
 ## Referencias
-Este repositorio esta basado en código de los siguientes repositorio:
+Este repositorio esta basado en código de los siguientes repositorios:
 * https://github.com/theAIGuysCode/yolov3_deepsort
 * https://github.com/aqeelanwar/SocialDistancingAI
