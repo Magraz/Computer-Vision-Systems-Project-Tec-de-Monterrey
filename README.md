@@ -89,4 +89,5 @@ Y listo. El video se analizará hasta completarse. Del lado izquierdo de la pant
 ## Referencias
 Este repositorio esta basado en código de los siguientes repositorio:
 https://github.com/theAIGuysCode/yolov3_deepsort
+<br>
 https://github.com/aqeelanwar/SocialDistancingAI
