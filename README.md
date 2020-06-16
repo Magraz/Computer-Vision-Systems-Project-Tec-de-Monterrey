@@ -83,6 +83,8 @@ El segundo paso es seleccionar la altura de una persona. Simplemente seleccionar
 El último paso es seleccionar el área que se desea monitorear. Solo encerrar el área deseada dentro del rectángulo verde.
 Y listo. El video se analizará hasta completarse. Del lado izquierdo de la pantalla aparecerá la vista aérea de los puntos y del lado derecho aparecerá el video con las detecciones. Una línea roja se dibujará entre objetos si están a una menor distancia que la establecida, esta distancia (metros) se puede modificar en el archivo.
 
+Un video con el proceso puede verse aqui https://www.youtube.com/watch?v=E8dFuK5nDh0
+
 ---
 ![alt text](https://github.com/Magraz/Proyecto-Sistemas-de-Vision-Computarizada/blob/master/images/example3.PNG "Ejemplo 3")
 
