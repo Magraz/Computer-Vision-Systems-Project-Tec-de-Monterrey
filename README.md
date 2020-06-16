@@ -8,7 +8,9 @@ Este repositorio contiene código e instrucciones para poder ejecutar un detecto
 </ul>
 
 ## Instrucciones de ejecución
-Estas instrucciones asumen que se esta trabajando en un sistema operativo Windows.
+Estas instrucciones asumen que se esta trabajando en un sistema operativo Windows o Linux.
+
+NOTA: Es posible que haya problemas corriendo el código sobre GPU en un sistema Windows, por lo tanto para usar GPU es recomendado trabajar sobre alguna distribución de linux.
 
 Primeramente hay que instalar Anaconda https://www.anaconda.com/products/individual
 
