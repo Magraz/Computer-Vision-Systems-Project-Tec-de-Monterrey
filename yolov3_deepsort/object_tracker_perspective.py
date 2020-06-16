@@ -1,24 +1,24 @@
-import time, random
-import numpy as np
-from absl import app, flags, logging
-from absl.flags import FLAGS
 import cv2
-import matplotlib.pyplot as plt
+import numpy as np
+import time, random
+from PIL import Image
 import tensorflow as tf
+from absl.flags import FLAGS
+import matplotlib.pyplot as plt
+from absl import app, flags, logging
 from scipy.spatial.distance import pdist, squareform
 
-from yolov3_tf2.models import (
-    YoloV3, YoloV3Tiny
-)
 from yolov3_tf2.dataset import transform_images
+from yolov3_tf2.models import YoloV3, YoloV3Tiny
 from yolov3_tf2.utils import draw_outputs, convert_boxes
 
-from deep_sort import preprocessing
 from deep_sort import nn_matching
-from deep_sort.detection import Detection
+from deep_sort import preprocessing
 from deep_sort.tracker import Tracker
+from deep_sort.detection import Detection
 from tools import generate_detections as gdet
-from PIL import Image
+import perspective_utils as pu
+
 
 flags.DEFINE_string('classes', './data/labels/coco.names', 'path to classes file')
 flags.DEFINE_string('weights', './weights/yolov3.tf',
@@ -32,57 +32,15 @@ flags.DEFINE_string('output_format', 'XVID', 'codec used in VideoWriter when sav
 flags.DEFINE_integer('num_classes', 80, 'number of classes in the model')
 
 
-# globals
-mouse_pts = None
-canvas_img = None
-temp_img = None
-
-def get_mouse_points(event, x, y, flags, param):
-    global  mouse_pts, canvas_img, temp_img
-    temp_img = canvas_img.copy()
-
-    if event == cv2.EVENT_LBUTTONDOWN:
-        mouseX, mouseY = x, y
-        if len(mouse_pts) < 4:
-            cv2.circle(canvas_img, (x, y), 2, (255, 90, 50), 4, cv2.LINE_AA)
-        elif len(mouse_pts) < 6:
-            cv2.circle(canvas_img, (x, y), 2, (25, 255, 240), 4, cv2.LINE_AA)
-        else:
-            cv2.circle(canvas_img, (x, y), 2, (50, 255, 75), 4, cv2.LINE_AA)
-        mouse_pts.append((x, y))
-
-    if len(mouse_pts) % 2 != 0:
-        if len(mouse_pts) < 4:
-            cv2.line(temp_img, mouse_pts[-1], (x, y), (255, 90, 50), 2, cv2.LINE_AA)
-        elif len(mouse_pts) < 6:
-            cv2.line(temp_img, mouse_pts[-1], (x, y), (25, 255, 240), 2, cv2.LINE_AA)
-        else:
-            cv2.rectangle(temp_img, mouse_pts[-1], (x, y), (50, 255, 75), 2, cv2.LINE_AA)
-
-    elif len(mouse_pts) != 0 and event == cv2.EVENT_LBUTTONDOWN:
-        if len(mouse_pts) <= 4:
-            cv2.line(canvas_img, mouse_pts[-2], (x, y), (255, 90, 50), 2, cv2.LINE_AA)
-        else:
-            cv2.line(canvas_img, mouse_pts[-2], (x, y), (25, 255, 240), 2, cv2.LINE_AA)
-
-
-def euclidean(point1, point2):
-    point1 = np.asarray(point1)
-    point2 = np.asarray(point2)
-
-    sq = (point1 - point2) ** 2
-    euc = np.sum(sq, axis=0) ** 0.5
-    return int(euc)
-
-
 def main(_argv):
-    global  mouse_pts, canvas_img, temp_img
-
-    # Definition of the parameters
+    # PARAMS
     max_cosine_distance = 0.5
     nn_budget = None
     nms_max_overlap = 1.0
     pure_yolo = False
+
+    AVG_PERSON_HEIGHT = 1.7  # meters
+    DANGER_THRESHOLD = 3.0  # meters
     
     #initialize deep sort
     output_name = FLAGS.output
@@ -142,33 +100,7 @@ def main(_argv):
                 break
 
         if not setup:
-            cv2.namedWindow("input_image")
-            cv2.setMouseCallback("input_image", get_mouse_points)
-
-            # setup for UI
-            canvas_img = image.copy()
-            temp_img = canvas_img.copy()
-            h_temp, w_temp = temp_img.shape[:-1]
-            mouse_pts = []
-
-            # UI loop -------------------------------------------------------------------
-            while True:
-                cv2.imshow("input_image", temp_img)
-                key = cv2.waitKey(1)
-                if len(mouse_pts) < 4:
-                    cv2.putText(temp_img, 'Selecciona dos lienas paralelas en un plano', (w_temp // 20, h_temp // 15),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 1, cv2.LINE_AA)
-                elif len(mouse_pts) < 6:
-                    cv2.putText(temp_img, 'Selecciona la altura de una persona', (w_temp // 20, h_temp // 15),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 1, cv2.LINE_AA)
-                else:
-                    cv2.putText(temp_img, 'Selecciona el area que quieres monitorear', (w_temp // 20, h_temp // 15),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 1, cv2.LINE_AA)
-                    
-                if len(mouse_pts) == 8 or key == ord('q'):
-                    cv2.destroyWindow("input_image")
-                    break
-            # ----------------------------------------------------------------------------
+            mouse_pts = pu.get_reference_pts_by_ui(image, pu.ui_callback)
 
             cv2.namedWindow("Worker Monitoring", cv2.WINDOW_NORMAL)
             cv2.resizeWindow("Worker Monitoring", 1000, 700)
@@ -179,54 +111,19 @@ def main(_argv):
             roi = mouse_pts[6:]
 
             # length between reference points
-            h_dst = max(euclidean(ref_pts[0], ref_pts[1]), euclidean(ref_pts[2], ref_pts[3]))
-            w_dst = max(euclidean(ref_pts[0], ref_pts[2]), euclidean(ref_pts[1], ref_pts[3]))
-
-            ref_len = euclidean(ref_len_pts[0], ref_len_pts[1])
+            w_dst = max(pu.euclidean(ref_pts[0], ref_pts[2]), pu.euclidean(ref_pts[1], ref_pts[3]))
+            ref_len = pu.euclidean(ref_len_pts[0], ref_len_pts[1])
 
             # calculating parallel vectors of lines
-            comp_pts = np.array(mouse_pts)
-            comp_pts = comp_pts * (-1)
-
-            v_1 = np.zeros(2, dtype='float')
-            v_1 = comp_pts[1] - comp_pts[0]
-            mag = np.sqrt(np.sum(np.square(v_1, dtype='float')))
-            v_1 = v_1 * (1 / mag)
-            v_1 = np.array([v_1[1], -v_1[0]], dtype='float')
-            c_1 = np.zeros(2, dtype='float')
-            c_1[0] = comp_pts[1][0] + v_1[0] * w_dst
-            c_1[1] = comp_pts[1][1] + v_1[1] * w_dst
-            c_1[0] = c_1[0] * (-1)
-            c_1[1] = c_1[1] * (-1)
-
-            v_2 = np.zeros(2, dtype='float')
-            v_2 = comp_pts[0] - comp_pts[1]
-            mag = np.sqrt(np.sum(np.square(v_2, dtype='float')))
-            v_2 = v_2 * (1 / mag)
-            v_2 = np.array([-v_2[1], v_2[0]], dtype='float')
-            c_2 = np.zeros(2, dtype='float')
-            c_2[0] = comp_pts[0][0] + v_2[0] * w_dst
-            c_2[1] = comp_pts[0][1] + v_2[1] * w_dst
-            c_2[0] = c_2[0] * (-1)
-            c_2[1] = c_2[1] * (-1)
+            c_1 = pu.get_perpendicular_vector(mouse_pts[0], mouse_pts[1],
+                                              direction='ccw', magnitude=w_dst)
+            c_2 = pu.get_perpendicular_vector(mouse_pts[1], mouse_pts[0],
+                                              direction='cw', magnitude=w_dst)
 
             # getting the transformation matrix between the original reference
             # and the perpendicular "corrected" points
             dst = [ref_pts[0], ref_pts[1], c_2, c_1]
-            dst = np.array(dst)
-            dst = np.array(dst, dtype='float32')
-            ref_pts = np.array(ref_pts, dtype='float32')
-            M = cv2.getPerspectiveTransform(ref_pts, dst)
-
-            corner_pts = np.array([roi[0], [roi[1][0], roi[0][1]], roi[1], [roi[0][0], roi[1][1]]] , dtype='float32').reshape(-1, 1, 2)
-            transformed_corner_pts = cv2.perspectiveTransform(corner_pts, M)
-
-            # calculating transformation matrix with translation correction
-            [xmin, ymin] = np.int32(transformed_corner_pts.min(axis=0).ravel() - 0.5)
-            [xmax, ymax] = np.int32(transformed_corner_pts.max(axis=0).ravel() + 0.5)
-            t = [-(xmin), -(ymin)]
-            Ht = np.array([[1,0,t[0]],[0,1,t[1]],[0,0,1]])
-            new_M = Ht.dot(M)
+            new_M, Ht, borders = pu.get_homography_matrix(ref_pts, dst, roi)
 
             setup = True
 
@@ -271,20 +168,15 @@ def main(_argv):
                 class_name = track.get_class()
                 color = colors[int(track.track_id) % len(colors)]
                 color = [i * 255 for i in color]
-                # cv2.rectangle(img, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), color, 2)
-                # cv2.rectangle(img, (int(bbox[0]), int(bbox[1]-30)), (int(bbox[0])+(len(class_name)+len(str(track.track_id)))*17, int(bbox[1])), color, -1)
-                # cv2.putText(img, class_name + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1]-10)),0, 0.75, (255,255,255),2)
 
                 cntr_x = (bbox[0] + bbox[2]) / 2
                 cntr_y = (bbox[1] + bbox[3]) / 2
                 obj_pts.append([cntr_x, cntr_y])
                 obj_classes.append(str(class_name))
         else:
-            ## UNCOMMENT BELOW IF YOU WANT CONSTANTLY CHANGING YOLO DETECTIONS TO BE SHOWN ON SCREEN
             for det in detections:
                 bbox = det.to_tlbr()
                 class_name = det.get_class()
-                # cv2.rectangle(img,(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,0,0), 2)
 
                 cntr_x = (bbox[0] + bbox[2]) / 2
                 cntr_y = (bbox[1] + bbox[3]) / 2
@@ -294,12 +186,10 @@ def main(_argv):
         if len(obj_pts) == 0:
             temp_canvas = np.zeros((h_image, w_image + w_image // 3 + 3, 3), dtype='uint8')
             temp_canvas[:, w_image // 3 + 3:, :] = image
-
             cv2.imshow('Worker Monitoring', temp_canvas)
 
             if cv2.waitKey(1) == ord('q'):
                 break
-
             continue
 
         obj_pts = np.array(obj_pts, dtype ='float32').reshape(-1, 1, 2)
@@ -309,93 +199,18 @@ def main(_argv):
         transformed_obj_pts = cv2.perspectiveTransform(obj_pts, new_M).astype('int').reshape(-1, 2)
 
         # filtering the points that are not in the ROI
-        valid_pts = []
-        valid_classes = []
-        for i, pt in enumerate(transformed_obj_pts):
-            if np.all(pt >= 0):
-                valid_pts.append(pt)
-                valid_classes.append(obj_classes[i])
+        valid_pts, valid_classes = pu.remove_objects_off_limits(transformed_obj_pts, obj_classes)
 
-        valid_pts = np.array(valid_pts)
-
-        AVG_PERSON_HEIGHT = 1.7  # meters
-        DANGER_THRESHOLD = 2.5  # meters
         px_per_meter = ref_len / AVG_PERSON_HEIGHT
 
-        # determining pairs in danger
-        dist_condensed = pdist(valid_pts)
-        dist_matrix = squareform(dist_condensed)
-        dist_matrix = dist_matrix / px_per_meter
-        indexes_1, indexes_2 = np.where(dist_matrix < DANGER_THRESHOLD)
+        indices_in_danger, classes_in_danger = pu.detect_in_danger(valid_pts, valid_classes,
+                                                                   px_per_meter, DANGER_THRESHOLD)
 
-        indices_in_danger = []
-        classes_in_danger = []
-
-        pairs_history = [[] for _ in range(len(valid_pts))]
-        for p1, p2 in zip(indexes_1, indexes_2):
-            if p1 != p2:
-                if p1 not in pairs_history[p2] and p2 not in pairs_history[p1]:
-                    if obj_classes[p1] != obj_classes[p2]:
-                        indices_in_danger.append([p1, p2])
-                        classes_in_danger.append([obj_classes[p1], obj_classes[p2]])
-                    pairs_history[p1].append(p2)
-                    pairs_history[p2].append(p1)
-
-        # visual space ---------------------------------------------------------------------------------------
-        visual_corner_pts = np.array([[xmin, ymin], [xmax, ymin], [xmax, ymax], [xmin, ymax]]).astype('float32').reshape(-1, 1, 2)
-        visual_corner_pts = cv2.perspectiveTransform(visual_corner_pts, Ht).astype('int').reshape(-1, 2)
-
-        h_visual = visual_corner_pts[3][1]
-        w_visual = visual_corner_pts[1][0]
-        H_CANVAS = h_image
-        W_CANVAS = w_image // 3
-
-        h_canvas_factor = H_CANVAS / h_visual
-        w_canvas_factor = W_CANVAS / w_visual
-        visual_factor = np.array(w_canvas_factor, h_canvas_factor)
-
-        visual_canvas = np.zeros((H_CANVAS, W_CANVAS, 3))
-
-        # displaying information
-        for pt in valid_pts:
-            pt[0] = (pt[0] * w_canvas_factor).astype('int')
-            pt[1] = (pt[1] * h_canvas_factor).astype('int')
-            cv2.circle(visual_canvas, tuple(pt), 3, (255, 255, 255), -1)
-
-        obj_pts = obj_pts.reshape(-1, 2)
-        for pt in obj_pts:
-            cv2.circle(image, tuple(pt), 10, (0, 0, 0), 2, cv2.LINE_AA)
-            cv2.circle(image, tuple(pt), 2, (0, 0, 0), -1, cv2.LINE_AA)
-
-        for index in indices_in_danger:
-            pt1 = valid_pts[index[0]]
-            pt2 = valid_pts[index[1]]
-            cv2.line(visual_canvas, tuple(pt1), tuple(pt2), (0, 0, 255), 2, cv2.LINE_AA)
-
-            pt1 = obj_pts[index[0]]
-            pt2 = obj_pts[index[1]]
-            cv2.line(image, tuple(pt1), tuple(pt2), (0, 0, 255), 2, cv2.LINE_AA)
-        
-        if len(indices_in_danger) > 0:
-            cv2.rectangle(image, (w_temp // 25, h_temp // 100), (w_temp // 3, h_temp // 10), (0, 0, 0), -1)
-            cv2.putText(image, 'WARNING', (w_temp // 25, h_temp // 12),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
+        final_visualization = pu.visualize(image, borders, valid_pts, obj_pts, indices_in_danger, Ht)
 
         cv2.namedWindow("Worker Monitoring", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Worker Monitoring", 1000, 700)
-
-        final_visualization = np.zeros((h_image, w_image + W_CANVAS + 3, 3), dtype='uint8')
-        final_visualization[:, :W_CANVAS, :] = visual_canvas
-        final_visualization[:, W_CANVAS:W_CANVAS + 3, :] = 255
-        final_visualization[:, W_CANVAS + 3:, :] = image
-
         cv2.imshow("Worker Monitoring", final_visualization)
-
-        # print fps on screen 
-        # fps  = ( fps + (1./(time.time()-t1)) ) / 2
-        # cv2.putText(img, "FPS: {:.2f}".format(fps), (0, 30),
-        #                   cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
-        # cv2.imshow('output', img)
 
         if output_name:
             out.write(final_visualization)
