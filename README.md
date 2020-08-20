@@ -63,6 +63,8 @@ When executing the previous command we should obtain a screen showing the video 
 ---
 ![alt text](https://github.com/Magraz/Proyecto-Sistemas-de-Vision-Computarizada/blob/master/images/example2.PNG "Ejemplo 2")
 
+A video with results can be seen here https://www.youtube.com/watch?v=Y-Pjx-q0dsA&feature=emb_title
+
 El programa genera detecciones y rastrea estas detecciones a lo largo del video. En cuanto un vehículo se encuentra en un radio de 300px. (este número se puede modificar en el archivo object_tracker.py, por motivos de demostración en el video el valor es más alto de lo necesario) de un humano se aumenta el contador de personas en peligro  el humano es rodeado por un círculo rojo y el vehículo por un círculo verde, las dos clases son conectadas por una línea azul que indica la conexión entre los objetos. Por último, el video es guardado en `Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/data/videos` con el nombre que se asigne en el comando.
 
 The program generates detections and tracks these detections throughout the video. As soon as a vehicle is within a 300px radius (this number can be modified in the object_tracker.py file, for demonstration purposes in the video the value is higher than necessary) of a human, the counter of people in danger is increased and the human is surrounded by a red circle and the vehicle by a green circle, the two classes are connected by a blue line that indicates the connection between the objects. Finally, the video is saved in `Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/data/ videos` with the name assigned in the command.
@@ -91,7 +93,8 @@ The last step is to select the area you want to monitor. Just enclose the desire
 
 We are done. The video will be analyzed to completion. On the left side of the screen the aerial view of the points will appear and on the right side the video with the detections will appear. A red line will be drawn between objects if they are at a shorter distance than the established one, this distance (meters) can be modified in the file.
 
-A video with the process can be seen here https://www.youtube.com/watch?v=E8dFuK5nDh0
+A video with the calibration process can be seen here https://www.youtube.com/watch?v=E8dFuK5nDh0
+A video with the results can be seen here https://www.youtube.com/watch?v=KrtP9w_ymEM
 
 ---
 ![alt text](https://github.com/Magraz/Proyecto-Sistemas-de-Vision-Computarizada/blob/master/images/example3.PNG "Ejemplo 3")
