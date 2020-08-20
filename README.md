@@ -94,6 +94,7 @@ The last step is to select the area you want to monitor. Just enclose the desire
 We are done. The video will be analyzed to completion. On the left side of the screen the aerial view of the points will appear and on the right side the video with the detections will appear. A red line will be drawn between objects if they are at a shorter distance than the established one, this distance (meters) can be modified in the file.
 
 A video with the calibration process can be seen here https://www.youtube.com/watch?v=E8dFuK5nDh0
+
 A video with the results can be seen here https://www.youtube.com/watch?v=KrtP9w_ymEM
 
 ---
