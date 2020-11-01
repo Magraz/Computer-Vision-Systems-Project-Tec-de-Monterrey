@@ -65,14 +65,9 @@ When executing the previous command we should obtain a screen showing the video 
 
 A video with results can be seen here https://www.youtube.com/watch?v=Y-Pjx-q0dsA&feature=emb_title
 
-El programa genera detecciones y rastrea estas detecciones a lo largo del video. En cuanto un vehículo se encuentra en un radio de 300px. (este número se puede modificar en el archivo object_tracker.py, por motivos de demostración en el video el valor es más alto de lo necesario) de un humano se aumenta el contador de personas en peligro  el humano es rodeado por un círculo rojo y el vehículo por un círculo verde, las dos clases son conectadas por una línea azul que indica la conexión entre los objetos. Por último, el video es guardado en `Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/data/videos` con el nombre que se asigne en el comando.
-
 The program generates detections and tracks these detections throughout the video. As soon as a vehicle is within a 300px radius (this number can be modified in the object_tracker.py file, for demonstration purposes in the video the value is higher than necessary) of a human, the counter of people in danger is increased and the human is surrounded by a red circle and the vehicle by a green circle, the two classes are connected by a blue line that indicates the connection between the objects. Finally, the video is saved in `Proyecto-Sistemas-de-Vision-Computarizada/yolov3_deepsort/data/ videos` with the name assigned in the command.
 
 ## Experimental Solution
-Contamos con una versión experimental del detector que compensa la diferencia de perspectiva y maneja las medidas en metros.
-Esta versión tiene un uso igual al original, por lo que todos los comandos anteriores aplican siempre y cuando se cambie el nombre por el de esta versión. Por lo tanto, para ejecutar detección en un video abrimos una terminal de anaconda y nos movemos a la carpeta ```Repositorios/Proyecto-Sistemas-de-Vision-Computarizada``` y corremos los siguientes comandos:
-
 We have an experimental version of the detector that compensates for the difference in perspective and handles measurements in meters.
 This version has a use equal to the original one, so all the previous commands apply as long as the name is changed to that of this version. Therefore, to run detection in a video we open an anaconda terminal and move to the folder ```Repositorios/Proyecto-Sistemas-de-Vision-Computarizada``` and run the following commands:
 
